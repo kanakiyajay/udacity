@@ -53,6 +53,7 @@ for (var i = allRects.length - 1; i >= 0; i--) {
 };
 
 var centreX = 0 ,
+       timecount = 0,
        endpoints = [
                                  {x:0,y:0,name:"up"},
                                  {x:0,y:0,name:"right"},
@@ -60,6 +61,7 @@ var centreX = 0 ,
                                  {x:0,y:0,name:"left"},
                                ],
        centreY = 0 ,
+       totalRect =allRects.length ,
        clashX = 0,
        clashY = 0,
        currentAngle = 315,
@@ -83,44 +85,38 @@ var anim = new Kinetic.Animation(function  (frame) {
    directionY === "up" ?  circle.setY(centreY-5) : null ;
 
    //Check Below condition for all the rectangles
-   for (var i = allRects.length - 1; i >= 0; i--) {
-      //Check For the Four Edges
-      for (var j = 0; j < 4; j++) {
+   //if (frame.time>timecount+20) {
+     for (var i = 0; i < allRects.length; i++) {
+        //Check For the Four Edges
+           if(allRects[i].intersects(centreX,centreY))
+           {
+              /*There's is a clash between the brick and ball*/
+              anim.stop();
+              console.log("Has Intersected the brick");
+              //timecount = frame.time;
+              //console.log(timecount);
+              calculateEdges(function(){
+                  for (var j = 0; j < endpoints.length; j++){
 
-         if(allRects[i].intersects(endpoints[j].x,endpoints[j].y))
-         {
-            /*There's is a clash between the brick and ball*/
-            console.log("Has Intersected the brick");
-            changePath(endpoints[j].name);
-            //anim.stop();
-         }
-      };
-
-   };
-   calculateEdges();
+                    if (!allRects[i].intersects(endpoints[j])) {
+                      console.log(allRects[i].intersects(endpoints[j]));
+                      changePath(endpoints[j].name);
+                    };
+                  };
+              });
+           }
+     };
+   //};
 },layer);
 
-var changePath = function  (i,name) {
-  //Do Inverse
-  var posObj = {x:centreX,y:centreY};
-
-  //If true then ball hits horizontal
-  if(centreX > rectArray[i].startx&&centreX < rectArray[i].stopx)
-  {
-    console.log("Has hit horizontal");
-    directionY==="down" ? directionY = "up" : directionY==="down";
-    return;
-  };
-  //if true then ball hits vertical
-  if (centreY > rectArray[i].starty&&centreY < rectArray[i].stopy)
-  {
-    directionX==="right" ? directionX = "left" : directionX==="right";
-    console.log("Has hit vertical");
-    return
-  };
+var changePath = function  (name) {
+  console.log(name);
+  name==="left"||name==="right"? directionX = name : directionY = name ;
+  console.log(directionX);
+  console.log(directionY);
 }
 
-var calculateEdges = function  () {
+var calculateEdges = function  (done) {
   for (var i = 0; i < endpoints.length; i++) {
     if(endpoints[i].name==="up")
     {
@@ -131,15 +127,16 @@ var calculateEdges = function  () {
       endpoints[i].x = centreX;
       endpoints[i].y = centreY+10;
     };
-    if (endpoints[i].name==="down") {
+    if (endpoints[i].name==="right") {
       endpoints[i].x = centreX+10;
       endpoints[i].y = centreY;
     };
-    if (endpoints[i].name==="down") {
+    if (endpoints[i].name==="left") {
       endpoints[i].x = centreX-10;
       endpoints[i].y = centreY;
     };
   };
+  done();
 }
-calculateEdges();
+
 anim.start();
