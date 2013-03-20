@@ -1,3 +1,7 @@
+$.getJSON("level1.json",function  (data) {
+  console.log(data);
+});
+
 var stage = new Kinetic.Stage({
     container : "main",
     width:1366,
@@ -31,15 +35,7 @@ var rect = new Kinetic.Rect({
   id : "rect1"
 });
 
-var rect2 = new Kinetic.Rect({
-  x: 600,
-  y: 300,
-  width: 100,
-  height: 50,
-  fill: 'green',
-  name:"rect",
-  id : "rect2"
-});
+
 
 var rect3 = new Kinetic.Rect({
   x: 400,
@@ -74,11 +70,11 @@ var rect4 = new Kinetic.Rect({
   name:"rect",
   id : "rect4"
 });
-//rect.rotateDeg(30);
+rect.rotateDeg(30);
 //Layer2 Contains the ball
 layer2.add(circle);
 layer.add(rect);
-layer.add(rect2);
+
 layer.add(rect3);
 layer.add(rect4);
 layer.add(door);
@@ -98,6 +94,7 @@ for (var i = allRects.length - 1; i >= 0; i--) {
 };
 
 var centreX = 0 ,
+      addfactor = 0,
       timecount = 0,
        timeclash = 0,
        endpoints = [
@@ -118,26 +115,27 @@ var centreX = 0 ,
 
 var anim = new Kinetic.Animation(function  (frame) {
 
+   addfactor = frame.timeDiff/4;//For same speed throughout
+
    centreX = circle.getX();
    centreX>1360 ? directionX = "left" : null ;
    centreX< 10 ? directionX = "right" : null ;
-   directionX === "right" ?  circle.setX(centreX+4) : null ;
-   directionX === "left" ?  circle.setX(centreX-4) : null ;
+   directionX === "right" ?  circle.setX(centreX+addfactor) : null ;
+   directionX === "left" ?  circle.setX(centreX-addfactor) : null ;
 
    centreY = circle.getY();
    centreY>660 ? directionY = "up" : null ;
    centreY< 10 ? directionY = "down" : null ;
-   directionY === "down" ?  circle.setY(centreY+4) : null ;
-   directionY === "up" ?  circle.setY(centreY-4) : null ;
+   directionY === "down" ?  circle.setY(centreY+addfactor) : null ;
+   directionY === "up" ?  circle.setY(centreY-addfactor) : null ;
 
    //For General TimeDIfference
-   if (frame.timeDiff>18) {
    //For Clashing Time Difference
      if (door.intersects(centreX,centreY)) {
         anim.stop();
         alert("You Have Won the Game");
      };
-   if (frame.time>timeclash+200) {
+   if (frame.time>timeclash+150) {
    //Check Below condition for all the rectangles
      for (var i = 0; i < allRects.length; i++) {
         //Check For the Four Edges
@@ -159,7 +157,6 @@ var anim = new Kinetic.Animation(function  (frame) {
               });
            }
      };
-   };
    };
 },layer2);
 
