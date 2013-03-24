@@ -39,17 +39,11 @@ var rect3 = new Kinetic.Rect({
   draggable : true,
   fill: 'yellow',
   name:"rect",
-  id : "rect3",
-  dragBoundFunc: function(pos) {
-          return {
-            x: pos.x,
-            y: this.getAbsolutePosition().y
-          }
-        }
-});
+  id : "rect3"
+  });
 
 var rect4 = new Kinetic.Rect({
-  x: 200,
+  x: 500,
   y: 300,
   width: 80,
   height: 30,
@@ -85,6 +79,7 @@ for (var i = allRects.length - 1; i >= 0; i--) {
 };
 
 var centreX = 0 ,
+      isMoving = false,
       addfactor = 0,
       multiplyfactor =0 ,
       timecount = 0,
@@ -107,16 +102,16 @@ var centreX = 0 ,
 
 var anim = new Kinetic.Animation(function  (frame) {
 
-   addfactor = frame.timeDiff/16;//For same speed throughout
+   addfactor = frame.timeDiff/speed;//For same speed throughout
    multiplyfactor = currentincline*Math.PI/180;
    centreX = circle.getX();
-   centreX>1360/2 ? directionX = "left" : null ;
+   centreX>680 ? directionX = "left" : null ;
    centreX< 5 ? directionX = "right" : null ;
    directionX === "right" ?  circle.setX(centreX+Math.cos(multiplyfactor)*addfactor) : null ;
    directionX === "left" ?  circle.setX(centreX-Math.cos(multiplyfactor)*addfactor) : null ;
 
    centreY = circle.getY();
-   centreY>660/2 ? directionY = "up" : null ;
+   centreY>330 ? directionY = "up" : null ;
    centreY< 10 ? directionY = "down" : null ;
    directionY === "down" ?  circle.setY(centreY+Math.sin(multiplyfactor)*addfactor) : null ;
    directionY === "up" ?  circle.setY(centreY-Math.sin(multiplyfactor)*addfactor) : null ;
@@ -127,7 +122,7 @@ var anim = new Kinetic.Animation(function  (frame) {
         anim.stop();
         alert("You Have Won the Game");
      };
-   if (frame.time>timeclash+3000) {
+   if (frame.time>timeclash+300) {//Doesnt Clash 2 times
    //Check Below condition for all the rectangles
      for (var i = 0; i < allRects.length; i++) {
         //Check For the Four Edges
@@ -184,6 +179,16 @@ var calculateEdges = function  (done) {
   };
   done();
 }
+rect3.on("dragstart",function  () {
+  isMoving = true;
+  this.setFill("black");
+});
+
+rect3.on("dragend",function(){
+  isMoving = false;
+  console.log("dragend");
+  if(!isMoving) rect3.setFill("yellow");
+});
 function moveBall (angle,speed) {
 currentincline = angle*Math.PI/180;
 addfactor = speed;
@@ -202,4 +207,5 @@ directionY === "up" ?  circle.setY(centreY-Math.sin(currentincline)*addfactor) :
 console.log(centreY+Math.sin(currentincline)*addfactor);
 
 }
+var speed = 10;
 anim.start();
