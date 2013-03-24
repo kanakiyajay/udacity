@@ -1,42 +1,41 @@
-var currentslope = Math.tan(-45);
 var currentincline = 45;
 
 var stage = new Kinetic.Stage({
     container : "main",
-    width:1366,
-    height:667
+    width:1366/2,
+    height:667/2
 });
 
 var door = new Kinetic.Circle({
-  x : 900,
-  y:  600,
-  radius : 20,
+  x : 450,
+  y:  300,
+  radius : 15,
   fill : "blue"
 });
 
 var circle = new Kinetic.Circle({
 
-    x : 20,
-    y: 20,
+    x : 10,
+    y: 10,
     radius : 9,
     fill:"black",
 });
 
 var rect = new Kinetic.Rect({
-  x: 220,
-  y: 300,
-  width: 100,
-  height: 50,
+  x: 110,
+  y: 150,
+  width: 80,
+  height: 30,
   fill: 'brown',
   name:"rect",
   id : "rect1"
 });
 
 var rect3 = new Kinetic.Rect({
-  x: 400,
-  y: 100,
-  width: 100,
-  height: 50,
+  x: 200,
+  y: 70,
+  width: 80,
+  height: 30,
   draggable : true,
   fill: 'yellow',
   name:"rect",
@@ -50,15 +49,16 @@ var rect3 = new Kinetic.Rect({
 });
 
 var rect4 = new Kinetic.Rect({
-  x: 400,
-  y: 500,
-  width: 100,
-  height: 50,
+  x: 200,
+  y: 300,
+  width: 80,
+  height: 30,
   fill: 'green',
   name:"rect",
   id : "rect4"
 });
 
+//rect.setRotationDeg(-30);
 //Layer2 Contains the ball
 var layer = new Kinetic.Layer();
 var layer2 = new Kinetic.Layer();
@@ -110,13 +110,13 @@ var anim = new Kinetic.Animation(function  (frame) {
    addfactor = frame.timeDiff/16;//For same speed throughout
    multiplyfactor = currentincline*Math.PI/180;
    centreX = circle.getX();
-   centreX>1360 ? directionX = "left" : null ;
-   centreX< 10 ? directionX = "right" : null ;
+   centreX>1360/2 ? directionX = "left" : null ;
+   centreX< 5 ? directionX = "right" : null ;
    directionX === "right" ?  circle.setX(centreX+Math.cos(multiplyfactor)*addfactor) : null ;
    directionX === "left" ?  circle.setX(centreX-Math.cos(multiplyfactor)*addfactor) : null ;
 
    centreY = circle.getY();
-   centreY>660 ? directionY = "up" : null ;
+   centreY>660/2 ? directionY = "up" : null ;
    centreY< 10 ? directionY = "down" : null ;
    directionY === "down" ?  circle.setY(centreY+Math.sin(multiplyfactor)*addfactor) : null ;
    directionY === "up" ?  circle.setY(centreY-Math.sin(multiplyfactor)*addfactor) : null ;
@@ -127,23 +127,22 @@ var anim = new Kinetic.Animation(function  (frame) {
         anim.stop();
         alert("You Have Won the Game");
      };
-   if (frame.time>timeclash+150) {
+   if (frame.time>timeclash+3000) {
    //Check Below condition for all the rectangles
      for (var i = 0; i < allRects.length; i++) {
         //Check For the Four Edges
            if(allRects[i].intersects(centreX,centreY))
            {
               /*There's is a clash between the brick and ball*/
-              console.log("Has Intersected the brick");
+              console.log("Has clashed with the brick");
               timeclash = frame.time;
-              //anim.stop();
               //console.log(timeclash);
               calculateEdges(function(){
                   for (var j = 0; j < endpoints.length; j++){
                     //Only one point wont be intersecting.
                     if (!allRects[i].intersects(endpoints[j])) {
                       console.log(endpoints[j].name);
-                      changePath(endpoints[j].name);
+                      changePath(endpoints[j].name,allRects[i]);
                       //anim.stop();
                     };
                   };
@@ -153,9 +152,12 @@ var anim = new Kinetic.Animation(function  (frame) {
    };
 },layer2);
 
-var changePath = function  (name) {
-
+var changePath = function  (name,rect) {
+  //rect.getRotationDeg() = Rotation of Shape
   name==="left"||name==="right"? directionX = name : directionY = name ;
+  //currentincline = currentincline - rect.getRotationDeg();
+  console.log(currentincline);
+  //moveBall(currentincline,4);
 
 }
 
@@ -165,18 +167,18 @@ var calculateEdges = function  (done) {
       {
       case "up":
         endpoints[i].x = centreX;
-        endpoints[i].y = centreY-10;
+        endpoints[i].y = centreY-Math.sin(multiplyfactor)*addfactor;
         break;
       case "down":
         endpoints[i].x = centreX;
-        endpoints[i].y = centreY+10;
+        endpoints[i].y = centreY+Math.sin(multiplyfactor)*addfactor;
         break;
       case "right" :
-        endpoints[i].x = centreX+10;
+        endpoints[i].x = centreX+Math.cos(multiplyfactor)*addfactor;
         endpoints[i].y = centreY;
         break;
       default:
-        endpoints[i].x = centreX-10;
+        endpoints[i].x = centreX-Math.cos(multiplyfactor)*addfactor;
         endpoints[i].y = centreY;
       }
   };
@@ -186,15 +188,15 @@ function moveBall (angle,speed) {
 currentincline = angle*Math.PI/180;
 addfactor = speed;
 centreX = circle.getX();
-centreX>1360 ? directionX = "left" : null ;
-centreX< 10 ? directionX = "right" : null ;
+centreX>1360/2 ? directionX = "left" : null ;
+centreX< 5 ? directionX = "right" : null ;
 console.log(centreX+Math.cos(currentincline)*addfactor);
 directionX === "right" ?  circle.setX(centreX+Math.cos(currentincline)*addfactor) : null ;
 directionX === "left" ?  circle.setX(centreX-Math.cos(currentincline)*addfactor) : null ;
 
 centreY = circle.getY();
-centreY>660 ? directionY = "up" : null ;
-centreY< 10 ? directionY = "down" : null ;
+centreY>660 /2? directionY = "up" : null ;
+centreY< 5 ? directionY = "down" : null ;
 directionY === "down" ?  circle.setY(centreY+Math.sin(currentincline)*addfactor) : null ;
 directionY === "up" ?  circle.setY(centreY-Math.sin(currentincline)*addfactor) : null ;
 console.log(centreY+Math.sin(currentincline)*addfactor);
